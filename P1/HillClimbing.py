@@ -1,6 +1,7 @@
 import random
 import time
 import sys
+import csv
 
 def evaluateSolution(data, solution):
     routeLength = 0
@@ -52,17 +53,9 @@ def hillClimbing(data):
     return solution, routeLength
 
 def main():
-    data = [
-[0, 1000, 913, 311, 495, 864, 851, 758, 869, 656] ,
-[1000, 0, 788, 616, 986, 243, 791, 336, 800, 73] ,
-[913, 788, 0, 410, 143, 461, 674, 634, 35, 988] ,
-[311, 616, 410, 0, 965, 966, 136, 225, 884, 210] ,
-[495, 986, 143, 965, 0, 368, 197, 599, 309, 17] ,
-[864, 243, 461, 966, 368, 0, 116, 673, 222, 154] ,
-[851, 791, 674, 136, 197, 116, 0, 742, 303, 101] ,
-[758, 336, 634, 225, 599, 673, 742, 0, 326, 953] ,
-[869, 800, 35, 884, 309, 222, 303, 326, 0, 369] ,
-[656, 73, 988, 210, 17, 154, 101, 953, 369, 0] ]
+    
+    data = []
+    
     start = time.time()
 
     # Código a medir
@@ -70,8 +63,35 @@ def main():
     # -------------
 
     end = time.time()
-    print(end-start)
+
+    endTime = end - start
+
+    print(endTime)
     
+    #line = [str(len(s[0])), str(endTime), str(s[1])]
+
+    #with open('Output.txt', 'a') as f:
+        #f.writelines(line)
+
+    #f.close()
+
+    try:
+        outputCSV = open('output.csv', 'a')
+        fields = ['N Cities', 'Time', 'Length']
+        output = csv.DictWriter(outputCSV, fieldnames=fields)
+        # output.writeheader() - Use it only for the first time
+        
+        #for indice in range(6):
+        #    salida.writerow({ 'Campo1':indice+1,
+        #                     'Campo2':chr(ord('a') + indice)})
+        output.writerow({ 'N Cities':len(s[0]),'Time':endTime,'Length':s[1]})
+                           
+        output.writerow
+
+    finally:
+        outputCSV.close()
+
+    print()
     print("--------------")
     print("Final solution: ",s[0])
     print("Final route length: ",s[1])
