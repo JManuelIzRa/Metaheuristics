@@ -12,7 +12,7 @@
 \usepackage{listings} % Para mostrar fragmentos de código.
 \usepackage{multicol}
 
-\title{Assignment 1}
+\title{Assignment 1. Hill climbing and simulated annealing }
 \author{José Manuel Izquierdo Ramírez}
 
 \newcommand{\headrulecolor}[1]{\patchcmd{\headrule}{\hrule}{\color{#1}\hrule}{}{}}
@@ -37,10 +37,14 @@
     \begin{titlepage}
         
         \centering
-        {\LARGE\bfseries Assignment 1\par}
+        {\LARGE\bfseries Assignment 1. Hill climbing and simulated annealing \par}
         \vspace{0,5cm}
         {\itshape\Large Metaheuristics \par}
         \vspace{0,5cm}        
+        \vspace{1cm}
+        \includegraphics[width=0.6\textwidth]{../media/Logo_UCO.png}\par
+        \vspace{3cm}
+        {\LARGE\bfseries José Manuel Izquierdo Ramírez \par}
 
         %{\large \today\par}
 
@@ -48,6 +52,7 @@
     
     \begin{index}
         \tableofcontents
+        \newpage
         \listoffigures
     \end{index}
 
@@ -134,23 +139,122 @@
 
         \end{figure}
 
+        \newpage
 
         \subsection{Do you always get the best solution? Why? What does it depend on?}
-    
+
+            This algorithm not always obtains the best solution, it depends on the initial temperature and the stop condition.
+
+            
+        When the temperature is too high we have more probabilities to found the best solution, also we can start near the best solution and get
+        far away and do not find it.
+
         \subsection{Analyze how the behavior of the algorithm varies as we change the stop criteria
     and the initial temperature.}
+
+            I have evaluated the algorithm with 75 cities and 5 iterations for each value of initial temperature and stop condition.
+
+            \begin{figure}[H]
+
+                \centering
+                \includegraphics[width=0.5\textwidth]{../media/03.SimAnnealing-Initial-Ta-time-75cities.png}
+                \caption{Execution time of Simmulated Annealing changing the initial temperature}
+                \label{Execution time of Simmulated Annealing changing the initial temperature}
     
+            \end{figure}
+
+            \begin{figure}[H]
+
+                \centering
+                \includegraphics[width=0.5\textwidth]{../media/03.SimAnnealing-Initial-Ta-length-75cities.png}
+                \caption{Length of the solution of Simmulated Annealing changing the initial temperature}
+                \label{Length of the solution of Simmulated Annealing changing the initial temperature}
+    
+            \end{figure}
+
+            As I had thought when you increase the initial temperature you are very close to the best solution, however 
+            the computational time increases.
+
+            \begin{figure}[H]
+
+                \centering
+                \includegraphics[width=0.5\textwidth]{../media/03.SimAnnealing-Stop-criteria-time-75cities.png}
+                \caption{Execution time of Simmulated Annealing changing the stop condition}
+                \label{Execution time of Simmulated Annealing changing the stop condition}
+    
+            \end{figure}
+
+            \begin{figure}[H]
+
+                \centering
+                \includegraphics[width=0.5\textwidth]{../media/03.SimAnnealing-Stop-criteria-length-75cities.png}
+                \caption{Length of the solution of Simmulated Annealing changing the stop condition}
+                \label{Length of the solution of Simmulated Annealing changing the stop condition temperature}
+    
+            \end{figure}
+
+            As we can see when the stop condition is too high the algorithm stop to early.
+
+
         \subsection{Modify the code to use different cooling functions}
     
             \subsubsection{Logarithmic.}
+
+                \begin{lstlisting}[language=Python]
+                    t = (alpha * t)/math.log(1+it)
+                \end{lstlisting}
+
     
             \subsubsection{Geometric.}
-    
+            
+                \begin{lstlisting}[language=Python]
+                    t = math.pow(alpha,it)*t 
+                \end{lstlisting}
+
         \subsection{How do these functions affect the final results? Why? Help yourself by representing the values of these functions. Look for new features and compare them to the old ones.}
+
+            Changing the cooling function I have evaluate the algorithm using a range between 5 and 150 cities and 5 iterations for each one.
+
+            \begin{figure}[H]
+
+                \centering
+                \includegraphics[width=0.5\textwidth]{../media/03.SimAnnealing-Geometric-time.png}
+                \caption{Time complexity using Geometric cooling function}
+                \label{Time complexity using Geometric cooling function}
+    
+            \end{figure}
+
+            \begin{figure}[H]
+
+                \centering
+                \includegraphics[width=0.5\textwidth]{../media/03.SimAnnealing-Geometric-length.png}
+                \caption{Length of the solution using Geometric cooling function}
+                \label{Length of the solution using Geometric cooling function}
+    
+            \end{figure}
+
+            \begin{figure}[H]
+
+                \centering
+                \includegraphics[width=0.5\textwidth]{../media/03.SimAnnealing-Logarithmic-time.png}
+                \caption{Time complexity using Logarithmic cooling function}
+                \label{Time complexity using Logarithmic cooling function}
+    
+            \end{figure}
+
+            \begin{figure}[H]
+
+                \centering
+                \includegraphics[width=0.5\textwidth]{../media/03.SimAnnealing-Logarithmic-length.png}
+                \caption{Length of the solution using Logarithmic cooling function}
+                \label{Length of the solution using Logarithmic cooling function}
+    
+            \end{figure}
     
         \subsection{How would you improve the algorithm? For example, reheating so often. Modify
     the code with this and any other improvement you guess is appropriate. Analyze
     the results.}
 
- 
+            To improve that algorithm I would take some time evaluating all the possibles combinations of parameters to found the best one.
+
 \end{document}
