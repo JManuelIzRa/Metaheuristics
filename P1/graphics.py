@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 pd.set_option("display.precision",2)
 
-df = pd.read_csv('data\output_SimAnnealing.csv')
+df = pd.read_csv('data\output_SimAnnealing_Logarithmic.csv')
 
 print(df.columns)
 
@@ -15,13 +15,14 @@ cities = [5,6,7,10,15,20,30,50,75,100,150]
 time = []
 length = []
 
+stop_criteria = [0.05,0.1,0.25,0.5,0.75,0.99]
+
 for city in cities:
     
     # It calculates the mean of the time and for every city amd
     # store it in a list
-    init1.append(df[ (df["N Cities"] == city) & (df["Initial Ta"] == 1)]["Time"].mean())
-    init3.append(df[ (df["N Cities"] == city) & (df["Initial Ta"] == 10)]["Time"].mean())
-
+    init1.append(df[df["N Cities"] == city]["Time"].mean())
+    
     #length.append(df[df["N Cities"] == city]["Length"].mean())
 
 
@@ -29,13 +30,12 @@ fig, ax = plt.subplots()
 
 # ax.plot(cities,length, cities, time) To combine diagrams
 
-ax.plot(cities,init1,label='Ta Inicial = 1')
-ax.plot(cities,init3,label='Ta Inicial = 10')
+ax.plot(cities,init1)
+
+
 
 ax.set_xlim(0, 150)
-ax.set_xlabel('Nº of Cities')
+ax.set_xlabel('Nº Cities')
 ax.set_ylabel('Time')
-
-plt.legend()
 
 plt.show()
