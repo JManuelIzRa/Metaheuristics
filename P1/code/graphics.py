@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 pd.set_option("display.precision",2)
 
-df = pd.read_csv('data\output_SimAnnealing_Logarithmic.csv')
+df = pd.read_csv('..\data\output_SimAnnealing_Logarithmic.csv')
 
 print(df.columns)
 

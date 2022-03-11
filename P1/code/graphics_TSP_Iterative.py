@@ -5,7 +5,7 @@ import numpy as np
 
 pd.set_option("display.precision",2)
 
-df = pd.read_csv('data\output_iterated_local_search.csv')
+df = pd.read_csv('..\data\output_iterated_local_search.csv')
 
 print(df.columns)
 
