@@ -37,7 +37,7 @@ def getBestNeighbor(solution, data):
             bestNeighbor = neighbor
     return bestNeighbor, bestLength
 
-@profile
+#@profile
 def hillClimbing(data):
     l=len(data)
     ##Create a random solution
@@ -220,8 +220,12 @@ def main():
     iterations = 0
     best_solution = 100000
     # Código a medir
-    
-    s=hillClimbing(data)
+    iterations = 100
+    for i in range(iterations):
+        s=hillClimbing(data)
+
+        if s[1]<best_solution:
+            best_solution = s[1]
 
     # -------------
 
@@ -240,7 +244,7 @@ def main():
         #for indice in range(6):
         #    salida.writerow({ 'Campo1':indice+1,
         #                     'Campo2':chr(ord('a') + indice)})
-        output.writerow({ 'N Cities':len(s[0]),'Time':endTime,'Length':s[1],'Iterations':iterations})
+        output.writerow({ 'N Cities':len(s[0]),'Time':endTime,'Length':best_solution,'Iterations':iterations})
                            
         output.writerow
 
