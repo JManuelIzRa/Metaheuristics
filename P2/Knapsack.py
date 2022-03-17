@@ -15,13 +15,15 @@ def evaluateSolution(solution, prices, weights, maxWeight):
 def applyGeneticOperator(population, k, cProb, mProb):
 
     #Select parents through a tournament of size k
+    selection(k)
 
     #Cross parents with a probability cProb
     #if random.randint(1,100) <= cProb:
+    operator_cross()
 
     #Mutate parents with a probability mProb
     #if random.randint(1,100) <= mProb:
-
+    operator_mutate()
 
     return population #Return the new population (not evaluated)
 
