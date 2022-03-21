@@ -137,3 +137,5 @@ dmypy.json
 *.out
 *.toc
 *.sync*
+
+*.zip
