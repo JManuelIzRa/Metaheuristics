@@ -191,7 +191,9 @@ if __name__ == "__main__":
     
     cProb = 0.7 #Cross probability
 
-    # Accuracy when mProb changes
+    ###############################
+    # Accuracy when mProb changes #
+    ###############################
     
     mProb = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1] #Mutation probability
 
@@ -204,12 +206,32 @@ if __name__ == "__main__":
         accuracy_mProb.append(a)
 
     print("Accuracy mProb: ",accuracy_mProb)
+    
+    valores_mochila = []
 
-    correlacion_mProb = stats.pearsonr(mProb, accuracy_mProb)
+    for i in range (len(population)):
+        
+        # Eliminamos los valores de mochila = 0 al considerarlos como no validos y porque añadirian mucha varianza al resultado.
+        if population[i][1] > 0:
+            valores_mochila.append(population[i][1])
+            
+    
 
-    print("Correlación con mProb",correlacion_mProb)
+    print("Valores mochila: ", valores_mochila)
 
-    # Accuracy when nSolutions changes
+    correlacion_mProb, p_value = stats.pearsonr(mProb, accuracy_mProb)
+
+    print("Correlación con mProb: ",correlacion_mProb) # Correlación negativa. Tienen una tendencia opuesta.
+
+    mean, var, std = stats.mvsdist(valores_mochila)
+
+    print("Media valor de la mochila: ", mean.mean())
+    print("Varianza valor de la mochila: ", mean.var())
+    print("Desviacion tipìca valor de la mochila: ", mean.std())
+
+    ####################################
+    # Accuracy when nSolutions changes #
+    ####################################
 
     nSolutions = [10,20,30,40,50,60,70,80,90,100]
 
