@@ -1,0 +1,95 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\usepackage{float} % Elimina la condicion de flotante de las imagenes
+\usepackage[english, activeacute]{babel}
+\usepackage{amsmath}
+\usepackage{etoolbox,fancyhdr,xcolor} % Colores
+\usepackage[hidelinks]{hyperref} % Indice dinámico
+\usepackage[a4paper]{geometry}
+\usepackage{listings} % Para mostrar fragmentos de código.
+\usepackage{multicol}
+
+\title{Assignment 1. Hill climbing and simulated annealing }
+\author{José Manuel Izquierdo Ramírez}
+
+\newcommand{\headrulecolor}[1]{\patchcmd{\headrule}{\hrule}{\color{#1}\hrule}{}{}}
+\newcommand{\footrulecolor}[1]{\patchcmd{\footrule}{\hrule}{\color{#1}\hrule}{}{}}
+\pagestyle{fancy}
+\fancyhf{}% Clear header/footer
+\fancyhead[L]{\textsl{\leftmark}}
+\fancyfoot[C]{\thepage}% \fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}% Default \headrulewidth is 0.4pt
+\renewcommand{\footrulewidth}{0.4pt}% Default \footrulewidth is 0pt
+\headrulecolor{cyan!70}% Set header rule colour to 70% red.
+\footrulecolor{cyan!70}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\renewcommand{\subsectionmark}[1]{\markright{#1}}
+
+% Multicol
+\setlength{\columnseprule}{0.4pt}
+\def\columnseprulecolor{\color{cyan!70}}
+
+% Anular el sangrado
+\setlength{\parindent}{0cm}
+
+
+
+\begin{document}
+
+    \begin{titlepage}
+        
+        \centering
+        {\LARGE\bfseries Assignment 1. Hill climbing and simulated annealing \par}
+        \vspace{0,5cm}
+        {\itshape\Large Metaheuristics \par}
+        \vspace{0,5cm}        
+        \vspace{1cm}
+        \includegraphics[width=0.6\textwidth]{../media/Logo_UCO.png}\par
+        \vspace{3cm}
+        {\LARGE\bfseries José Manuel Izquierdo Ramírez \par}
+
+        %{\large \today\par}
+
+    \end{titlepage}
+    
+    \begin{index}
+        \tableofcontents
+        \newpage
+        \listoffigures
+    \end{index}
+
+    \newpage
+    
+    \section{Exercise 1.}
+    \subsection{How does this algorithm behave as we increase the complexity of the problem (number of cities in the TSP)?}
+
+        1. behaviour algorithm
+
+            pop = 100
+            #gen = 1000
+            cp = 0.8
+            mp = 0.2
+
+            Obtener la probabilidad de obtener el mejor incrementando la cantidad de objetos
+
+            Para obtner esto cogemos el mejor resultado o el mejor resultado y los cercanos a este tambn.
+
+            Best value +- 10%
+
+            2. Do the parameter setup on a problem that is very harder.
+
+            Population: 100,150,200
+
+            #Gen: 1000, 2000, 3000
+
+            cp: 0.7 0.8 0.9
+
+            mp: 0.1 0.2 0.3
+
+            3. Elitism
+
+            with the same parameters compare.
+\end{document}
