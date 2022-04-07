@@ -160,16 +160,16 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism):
         solution = []
         weight = 0
         
-        #while weight < maxWeight:
-        it = 0
-        while it < 6:
+        while weight < maxWeight:
+        #it = 0
+        #while it < 10:
             object = objects[random.randint(0, len(objects) - 1)]
             weight += weights[object]
-            #if weight <= maxWeight:
-            solution.append(object)
-            objects.remove(object)
+            if weight <= maxWeight:
+                solution.append(object)
+                objects.remove(object)
 
-            it += 1
+            #it += 1
 
         s = []
         for i in range(l):
@@ -490,7 +490,7 @@ if __name__ == "__main__":
 
     for size in k:
         for i in range(0,100):
-            population,a,mean,var,std = geneticAlgorithm(nSolutions = 10, maxGenerations = 10, mProb = 0.1, cProb=0.7,k=size,elitism=False)
+            population,a,mean,var,std = geneticAlgorithm(nSolutions = 20, maxGenerations = 10, mProb = 0.1, cProb=0.7,k=size,elitism=False)
 
             accuracy_iterations.append(a)
             mean_iterations.append(mean)
