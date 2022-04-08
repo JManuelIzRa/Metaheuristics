@@ -178,7 +178,8 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism):
         for i in range(l):
             s.append(0)
         for i in solution:
-            s[i] = 1
+            for j in i:
+                s[j] = solution[i][1]
         population.append([s,evaluateSolution(s,prices,weights,maxWeight)])
 
     #Guradamos la solucion de elite de la generacion inicial en caso de utilizarse elitismo
