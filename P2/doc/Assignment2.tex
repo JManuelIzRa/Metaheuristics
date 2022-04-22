@@ -306,6 +306,71 @@
     generated. Does it affect the final performance? Analyze this issue.}
 
 
+    \subsection*{Modifying the number of solutions}
 
+    \begin{figure}[H]
+
+        \centering
+        \includegraphics[width=1\textwidth]{../media/ej1/01.NSolutions_withInvSols_behaviour.png}
+        \caption{Statistics when we change the number of solutions and start with invalid solutions}
+        \label{Statistics when we change the number of solutions and start with invalid solutions}
+
+    \end{figure}
+
+   
+    \subsection*{Modifying the maximum number of generations}
+
+    \begin{figure}[H]
+
+        \centering
+        \includegraphics[width=1\textwidth]{../media/ej1/02.MaxGenerations_withInvSols_behaviour.png}
+        \caption{Statistics when we change the maximum number of generations and start with invalid solutions}
+        \label{Statistics when we change the maximum number of generations and start with invalid solutions}
+
+    \end{figure}
+
+    
+    \subsection*{Modifying the tournament size}
+
+    \begin{figure}[H]
+
+        \centering
+        \includegraphics[width=1\textwidth]{../media/ej1/03.TournamentSize_withInvSols_behaviour.png}
+        \caption{Statistics when we change the tournament size and start with invalid solutions}
+        \label{Statistics when we change the tournament size and start with invalid solutions}
+
+    \end{figure}
+
+    
+    
+    \subsection*{Modifying the crossover probability}
+
+    \begin{figure}[H]
+
+        \centering
+        \includegraphics[width=1\textwidth]{../media/ej1/04.CrossoverProb_withInvSols_behaviour.png}
+        \caption{Statistics when we change the probability and start with invalid solutions}
+        \label{Statistics when we change the probability of crossover and start with invalid solutions}
+
+    \end{figure}
+
+    
+    \subsection*{Modifying the mutation probability}
+
+    \begin{figure}[H]
+
+        \centering
+        \includegraphics[width=1\textwidth]{../media/ej1/05.MutationProb_withInvSols_behaviour.png}
+        \caption{Statistics when we change the probability of mutation and start with invalid solutions}
+        \label{Statistics when we change the probability of mutation and start with invalid solutions}
+
+    \end{figure}
+
+    The graph falls down to 0 because the results for that probabilities are NaN.
+
+    \subsection{Conclusions of the behavior of the algorithm with elitism}
+
+    In general, the accuracy is smaller than the accuracy starting with valid solutions or using elitism, as same as the average value of
+    the knapsack. On the other hand using invalid solutions increase the variance and the standard deviation.
 
 \end{document}
