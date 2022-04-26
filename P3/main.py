@@ -36,6 +36,7 @@ def readFile():
 
         list_of_dictionaries.append(dictionary)
 
+
     return list_of_dictionaries
 
 def evaluateSolution(solution, events, list_of_dictionaries, length):
@@ -45,15 +46,15 @@ def evaluateSolution(solution, events, list_of_dictionaries, length):
     
     for dictionary in list_of_dictionaries:
         
-        #temporal_dictionary = dictionary
-
         #equal = 0
         last_epoch = 0
         count = 0    
 
+        iterations = {'A':0,'B':0,'C':0,'D':0,'E':0,'F':0,'G':0,'H':0,'I':0,'J':0,'K':0,'L':0,'M':0,'N':0,'O':0,'P':0,'Q':0,'R':0,'S':0,'T':0}
+
        # print(element)
         for element in solution:
-            
+
             if type(element) == list:
                 
                 epoch_1 = dictionary.get(element[0])
@@ -62,22 +63,25 @@ def evaluateSolution(solution, events, list_of_dictionaries, length):
                 if epoch_1:                      
                     
                     if epoch_2:
+
+                        index = iterations[element[0]]
                         
-                        if int(epoch_1[0]) >= int(last_epoch):
+                        if int(epoch_1[index]) >= int(last_epoch) and epoch_1 == epoch_2:
 
                             total += 1
                             count += 1
 
-                            last_epoch = epoch_1[0]
+                            last_epoch = epoch_1[int(iterations[element[0]])]
 
-                            #if element[0] == element[1]:
+                            if element[0] == element[1]:
                                 
-                            #    temporal_dictionary[element[0]].pop(0)
+                                iterations[element[0]] += 1
 
-                            #else:
+                            else:
                                 
-                            #    temporal_dictionary[element[0]].pop(0)
-                            #    temporal_dictionary[element[1]].pop(0)
+                                iterations[element[0]] += 1
+                                iterations[element[1]] += 1
+
                             
             else:
 
@@ -85,14 +89,14 @@ def evaluateSolution(solution, events, list_of_dictionaries, length):
 
                 if epoch:                   
                     
-                    if int(epoch[0]) >= int(last_epoch):
+                    index = iterations[element]
+
+                    if int(epoch[int(index)]) >= int(last_epoch):
                     
                         total += 1
                         count += 1
                         
-                        last_epoch = int(epoch[0])
-
-                        #temporal_dictionary[element].pop(0)
+                        last_epoch = int(epoch[int(iterations[element])])
 
                     else:
 
@@ -101,6 +105,7 @@ def evaluateSolution(solution, events, list_of_dictionaries, length):
 
             if count == length:
                 frequency += 1
+
 
     #Returns the number of times that you find the events and penalize it when it doesnt match.
     return total, frequency
@@ -289,7 +294,7 @@ if __name__ == "__main__":
     accuracy_iterations = []
     accuracy = []
        
-    population = geneticAlgorithm(nSolutions = 100, maxGenerations = 500 , mProb = 0.4,cProb=0.8,k=3,elitism=True, length = 15)
+    population = geneticAlgorithm(nSolutions = 10, maxGenerations = 2 , mProb = 0.4,cProb=0.8,k=3,elitism=False, length = 10)
 
         #accuracy_iterations.append(a)
     population.sort(reverse=True,key=lambda population:population[1][0])
