@@ -1,3 +1,4 @@
+import multiprocessing
 import random
 
 def Average(lst):
@@ -38,6 +39,101 @@ def readFile():
 
 
     return list_of_dictionaries
+
+def evaluateSolution_thread(solution, events, list_of_dictionaries, length, total, frequency, lock):
+  
+    for dictionary in list_of_dictionaries:
+        
+        #equal = 0
+        last_epoch = 0
+        count = 0    
+
+        iterations = {'A':0,'B':0,'C':0,'D':0,'E':0,'F':0,'G':0,'H':0,'I':0,'J':0,'K':0,'L':0,'M':0,'N':0,'O':0,'P':0,'Q':0,'R':0,'S':0,'T':0}
+
+       # print(element)
+        for element in solution:
+            try:
+
+                if type(element) == list:
+                
+                    epoch_1 = dictionary.get(element[0])
+                    epoch_2 = dictionary.get(element[1])
+
+                    if epoch_1:                      
+                    
+                        if epoch_2:
+                        
+                            index = iterations[element[0]]
+                        
+                            if int(epoch_1[index]) >= int(last_epoch) and epoch_1 == epoch_2:
+                                
+                                lock.acquire()
+                                
+                                total.value += 1
+                                
+                                lock.release()
+
+                                count += 1
+
+                                last_epoch = epoch_1[int(iterations[element[0]])]
+
+                                if element[0] == element[1]:
+                                
+                                    iterations[element[0]] += 1
+
+                                else:
+                                
+                                    iterations[element[0]] += 1
+                                    iterations[element[1]] += 1
+
+                            
+                else:
+
+                    epoch = dictionary.get(element)
+
+                    if epoch:                   
+                    
+                        index = iterations[element]
+                    
+                        if int(epoch[int(index)]) >= int(last_epoch):
+                            
+                            lock.acquire()
+
+                            total.value += 1
+                            count += 1
+
+                            lock.release()
+                        
+                            last_epoch = int(epoch[int(iterations[element])])
+
+                        else:
+                            lock.acquire()
+
+                            total.value -= 1
+                            count -= 1
+
+                            lock.release()
+   
+            except IndexError:
+                lock.acquire()
+
+                total.value -= 1
+                count -= 1
+
+                lock.release()
+            
+                    
+
+            if count == length:
+                lock.acquire()
+
+                frequency.value += 1
+
+                lock.release()
+
+
+    #Returns the number of times that you find the events and penalize it when it doesnt match.
+    #return total, frequency
 
 def evaluateSolution(solution, events, list_of_dictionaries, length):
 
@@ -115,7 +211,8 @@ def evaluateSolution(solution, events, list_of_dictionaries, length):
 
 
     #Returns the number of times that you find the events and penalize it when it doesnt match.
-    return total/length, frequency/100
+    return total, frequency
+
 
 def TournamentSelection(population, k):
 
@@ -220,7 +317,7 @@ def applyGeneticOperator(population, k, cProb, mProb, events):
     return population #Return the new population (not evaluated)
 
 
-def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, min_length, max_length):
+def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, length):
 
     events = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T']
     list_of_dictionaries = readFile()
@@ -237,7 +334,7 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, min_length
         prob_occur_same_time = 0.9
         #while weight < maxWeight:
         it = 0
-        while it < random.randint(min_length,max_length):
+        while it < length:
             
             # It generates solutions with events that occur at the same time with a probability of 30%.
             if random.randint(1,100) <= (prob_occur_same_time*100):
@@ -260,7 +357,7 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, min_length
             
             it += 1
 
-        population.append([solutions,evaluateSolution(solutions,events,list_of_dictionaries, len(solutions) )])
+        population.append([solutions,evaluateSolution(solutions,events,list_of_dictionaries,length)])
 
     #Guradamos la solucion de elite de la generacion inicial en caso de utilizarse elitismo
     if elitism:
@@ -275,8 +372,30 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, min_length
 
         #Generational model
         population = []
+
+        process = []
         for solution in nSolutions:
-            population.append([solution[0],evaluateSolution(solution[0],events,list_of_dictionaries,len(solution[0]) )])
+
+            # initial total and frequency (in shared memory)
+            total = multiprocessing.Value('i',0)
+            frequency = multiprocessing.Value('i',0)
+
+            # creating a lock object
+            lock = multiprocessing.Lock()
+
+            # creating new processes
+            p = multiprocessing.Process(target=evaluateSolution_thread, args=(solution[0],events,list_of_dictionaries,length,lock))
+
+            process.append(p)
+
+            # starting processes
+            p.start()
+
+            # wait until processes are finished
+            p.join()
+
+            population.append([solution[0], p])
+
         it+=1
 
         #Comprobamos si se utiliza elitismo
@@ -301,9 +420,9 @@ if __name__ == "__main__":
     accuracy_iterations = []
     accuracy = []
        
-    population = geneticAlgorithm(nSolutions = 50, maxGenerations = 250 , mProb = 0.4,cProb=0.8,k=3,elitism=False, min_length = 10, max_length = 14)
+    population = geneticAlgorithm(nSolutions = 100, maxGenerations = 30 , mProb = 0.4,cProb=0.8,k=3,elitism=False, length = 10)
 
         #accuracy_iterations.append(a)
     population.sort(reverse=True,key=lambda population:population[1][0])
 
-    print(population[:10])
+    print(population)
