@@ -1,4 +1,54 @@
 import random
+import time
+
+
+def getBestNeighbor(solution, data, events, list_of_dictionaries):
+    ##Get the neighbors
+    neighbors = []
+    l=len(solution[0])
+
+    for i in range(l):
+        for j in range(i+1, l):
+            n = solution[0].copy()
+            n[i] = solution[0][j]
+            n[j] = solution[0][i]
+            neighbors.append(n)
+            
+    ##Get the best neighbor
+    bestNeighbor = neighbors[0]
+    ##evaluateSolution(solutions,events,list_of_dictionaries, len(solutions) )
+    bestTotal,bestFrequency,bestNEvents = evaluateSolution(bestNeighbor, events, list_of_dictionaries, len(bestNeighbor))
+    
+    for neighbor in neighbors:
+        
+        Total,Frequency,NEvents = evaluateSolution(neighbor, events, list_of_dictionaries, len(bestNeighbor))
+        
+        if Total > bestTotal:
+            bestTotal = Total
+            bestFrequency = Frequency
+            bestNEvents = NEvents
+
+            bestNeighbor = neighbor
+
+    return bestNeighbor, (bestTotal, bestFrequency, bestNEvents)
+
+def hillClimbing(data, events, list_of_dictionaries):
+    
+    solution = []
+    
+    solution.append(data[0][0])
+
+    total = data[0][1][0]
+    
+    neighbour = getBestNeighbor(solution, data, events, list_of_dictionaries)
+
+    while neighbour[1][0] > total:
+        solution = neighbour
+        total = neighbour[1][0]
+        neighbour = getBestNeighbor(solution, data, events, list_of_dictionaries)
+
+    return solution[0]#, (solution[1][0], solution[1][1], solution[1][2])
+    
 
 def Average(lst):
     return sum(lst) / len(lst)
@@ -39,6 +89,7 @@ def readFile():
 
     return list_of_dictionaries
 
+
 def evaluateSolution(solution, events, list_of_dictionaries, length):
 
     total = 0
@@ -57,6 +108,7 @@ def evaluateSolution(solution, events, list_of_dictionaries, length):
 
        # print(element)
         for element in solution:
+            
             try:
 
                 if type(element) == list:
@@ -105,9 +157,9 @@ def evaluateSolution(solution, events, list_of_dictionaries, length):
                             total -= 1
                             count -= 1
 
-                        if last_element != element:
-                            diff_letters += 1
-                            last_element = element
+                        if element != last_element:
+                          diff_letters += 1
+                          last_element = element
    
             except IndexError:
                 total -= 1
@@ -121,6 +173,7 @@ def evaluateSolution(solution, events, list_of_dictionaries, length):
 
     #Returns the number of times that you find the events and penalize it when it doesnt match.
     return total/length, frequency, diff_letters
+
 
 def TournamentSelection(population, k):
 
@@ -200,6 +253,7 @@ def mutation(hijos,mProb, events):
                 
     return mutados 
 
+
 def applyGeneticOperator(population, k, cProb, mProb, events):
 
     #Select parents through a tournament of size k
@@ -234,6 +288,8 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, min_length
 
     solutions = []
 
+    evaluated_solutions = []
+
     # We create n valid solutions with a determined length (7-9,10-14, 15+)
     for i in range(nSolutions):
         solutions = []
@@ -265,6 +321,8 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, min_length
             it += 1
 
         population.append([solutions,evaluateSolution(solutions,events,list_of_dictionaries, len(solutions) )])
+        
+        evaluated_solutions.extend(population)
 
     #Guradamos la solucion de elite de la generacion inicial en caso de utilizarse elitismo
     if elitism:
@@ -280,7 +338,26 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, min_length
         #Generational model
         population = []
         for solution in nSolutions:
-            population.append([solution[0],evaluateSolution(solution[0],events,list_of_dictionaries,len(solution[0]) )])
+
+            if solution in evaluated_solutions:
+                index = evaluated_solutions.index(solution)
+                population.append(evaluated_solutions[int(index)])
+                
+            else:
+                population.append([solution[0],evaluateSolution(solution[0],events,list_of_dictionaries,len(solution[0]) )])
+
+
+        population.sort(reverse=True,key=lambda population: (population[1][0], population[1][2]) )
+
+        if population[0][1][0] > 60:
+            bestNeighbour = list(hillClimbing(population, events, list_of_dictionaries))
+            
+            population.pop()
+                
+            population.append([bestNeighbour,evaluateSolution(bestNeighbour,events,list_of_dictionaries,len(bestNeighbour) )])
+            
+        evaluated_solutions.extend(population)
+
         it+=1
 
         #Comprobamos si se utiliza elitismo
@@ -289,13 +366,13 @@ def geneticAlgorithm(nSolutions,maxGenerations,mProb,cProb,k,elitism, min_length
             population.sort(reverse=True,key=lambda population: (population[1][0], population[1][2]) )
                 #Comprobamos si la solucion elite de la generación anterior es mejor que
                 #la peor solucion de la  nueva generacion, y la conservamos en caso de ser asi 
-            if population[len(population)-1][1] < eliteSolucion[1]:
+            if population[len(population)-1][1][0] < eliteSolucion[1][0]:
                 population.pop()
                 population.append(eliteSolucion)
             #Guardamos la solucion elite de la nueva generación
             population.sort(reverse=True,key=lambda population: (population[1][0], population[1][2]) )  
             eliteSolucion=population[0]
-        
+
     return population
 
 
@@ -305,9 +382,45 @@ if __name__ == "__main__":
     accuracy_iterations = []
     accuracy = []
        
-    population = geneticAlgorithm(nSolutions = 50, maxGenerations = 250 , mProb = 0.4,cProb=0.8,k=3,elitism=False, min_length = 10, max_length = 14)
+    start = round(time.time() * 1000)
+    
+    population = geneticAlgorithm(nSolutions = 50, maxGenerations = 50 , mProb = 0.4,cProb=0.8,k=3,elitism=True, min_length = 7, max_length = 9)
+    #population = geneticAlgorithm(nSolutions = 50, maxGenerations = 150 , mProb = 0.4,cProb=0.8,k=3,elitism=True, min_length = 10, max_length = 14)
+    #population = geneticAlgorithm(nSolutions = 50, maxGenerations = 500 , mProb = 0.4,cProb=0.8,k=3,elitism=True, min_length = 15, max_length = 30)
+
+
+    end = round(time.time() * 1000)
+
+    time = end - start
 
         #accuracy_iterations.append(a)
-    population.sort(reverse=True,key=lambda population:population[1][0])
+    population.sort(reverse=True,key=lambda population: (population[1][0], population[1][2]) )
 
-    print(population[:10])
+    for i in range(0,10):
+        print(population[i])
+
+    sum_frequency = 0
+    sum_nEvents = 0
+
+    best_frequency = 0
+    worst_frequency = 100
+
+    for i in range(0,10):
+        sum_frequency += population[i][1][1]
+
+        sum_nEvents += len(population[i][0])
+
+        if population[i][1][1] > best_frequency:
+            best_frequency = population[i][1][1]
+        if population[i][1][1] < worst_frequency:
+            worst_frequency = population[i][1][1]
+    
+    mean_frequency = sum_frequency/10
+
+    mean_nEvents = sum_nEvents/10
+
+    print(f"\nMean Frequency: {mean_frequency}\nMean Number of Events: {mean_nEvents}.")
+
+    print(f"\nBest frequency: {best_frequency}\nWorst frequency: {worst_frequency}.")
+
+    print(f"\nTime: {time}")
