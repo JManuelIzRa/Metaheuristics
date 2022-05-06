@@ -1,0 +1,408 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\usepackage{float} % Elimina la condicion de flotante de las imagenes
+\usepackage[english, activeacute]{babel}
+\usepackage{amsmath}
+\usepackage{etoolbox,fancyhdr,xcolor} % Colores
+\usepackage[hidelinks]{hyperref} % Indice dinámico
+\usepackage[a4paper]{geometry}
+\usepackage{listings} % Para mostrar fragmentos de código.
+\usepackage{multicol}
+\usepackage[lighttt]{lmodern}
+\usepackage{tikz}
+
+\usetikzlibrary{shapes.geometric, arrows}
+
+\title{Assignment 3.}
+\author{José Manuel Izquierdo Ramírez}
+
+\newcommand{\headrulecolor}[1]{\patchcmd{\headrule}{\hrule}{\color{#1}\hrule}{}{}}
+\newcommand{\footrulecolor}[1]{\patchcmd{\footrule}{\hrule}{\color{#1}\hrule}{}{}}
+\pagestyle{fancy}
+\fancyhf{}% Clear header/footer
+\fancyhead[L]{\textsl{\leftmark}}
+\fancyfoot[C]{\thepage}% \fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}% Default \headrulewidth is 0.4pt
+\renewcommand{\footrulewidth}{0.4pt}% Default \footrulewidth is 0pt
+\headrulecolor{cyan!70}% Set header rule colour to 70% red.
+\footrulecolor{cyan!70}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\renewcommand{\subsectionmark}[1]{\markright{#1}}
+
+% Multicol
+\setlength{\columnseprule}{0.4pt}
+\def\columnseprulecolor{\color{cyan!70}}
+
+% Anular el sangrado
+%\setlength{\parindent}{0cm}
+
+
+\lstset{basicstyle=\ttfamily, keywordstyle=\bfseries}
+\ttfamily
+\DeclareFontShape{OT1}{lmtt}{m}{it}
+    {<->sub*lmtt/m/sl}{}
+
+\begin{document}
+
+    \tikzstyle{startstop} = [rectangle, rounded corners, minimum width = 2cm, minimum height=1cm,text centered, draw = black]
+    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=2cm, minimum height=1cm, text centered, draw=black]
+    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+    \tikzstyle{decision} = [diamond, aspect = 3, text centered, draw=black]
+     % Forma de flecha
+    \tikzstyle{arrow} = [->,>=stealth]
+
+    \begin{titlepage}
+        
+        \centering
+        {\LARGE\bfseries Assignment 3. \par}
+        \vspace{0,5cm}
+        {\itshape\Large Metaheuristics \par}
+        \vspace{0,5cm}        
+        \vspace{1cm}
+        \includegraphics[width=0.6\textwidth]{../media/Logo_UCO.png}\par
+        \vspace{3cm}
+        {\LARGE\bfseries José Manuel Izquierdo Ramírez \par}
+
+        %{\large \today\par}
+
+    \end{titlepage}
+    
+    \begin{index}
+        \tableofcontents
+        \newpage
+        \listoffigures
+    \end{index}
+
+    \newpage
+    
+    \section{Introduction}
+    
+    In this practice we have been asked to implement an algorithm of our choice to solve the problem given.
+
+    \section{Problem approach}
+
+    With a given dataset we have to implement an algorithm that finds patterns that repeat throughout it.
+
+    \subsection{Decide on the encoding}
+
+    At first I though of using a tree-based encoding, but after some deliberation I decided to use an alphabetic encoding.
+
+    \begin{lstlisting}[language=Python]
+        
+        solution = ['R', 'D', 'H', 'R', 'B', 'F', 'A']
+        
+        solution = ['R', 'D', ['H', 'J'], 'R', 'B', 'F']
+        
+    \end{lstlisting}
+
+    When creating random solutions I allow that two events can happen at the same time with an arbitrarily set probability. 
+
+    \begin{lstlisting}[language=Python]
+        ...
+        for i in range(nSolutions):
+        solutions = []
+        
+        #Probability of having more than one event at the same time
+
+        prob_occur_same_time = 0.9
+
+        it = 0
+
+        #Generate solutions between the min and max length randomly
+        while it < random.randint(min_length,max_length):
+            
+            #It generates solutions with events that occur at the 
+            same time with a probability of 90%.
+
+            if random.randint(1,100) <= (prob_occur_same_time*100):
+                
+                ...
+            else:
+               
+                ...            
+            it += 1
+
+        population.append([solutions,evaluateSolution(solutions,
+                            events, list_of_dictionaries, 
+                                len(solutions) )])
+
+    \end{lstlisting}
+
+    \subsection{Decide on the heuristic}
+
+    To start with I really liked the idea of using artificial ant colony algorithm to solve it, 
+    but as much as I thought about it I didn't see that it fit completely with the problem we are handling.
+
+    Finally I decided to implement a genetic algorithm; having done it in practice 2 I thought of adding 
+    something more, that is why I have made a few implementations that I will detail later on.
+
+    \subsection{How to evaluate the solutions?}
+
+    In my opinion the evaluation function is one of the most important parts of a genetic algorithm, 
+    because if it is not accurate the population will not evolve correctly, will not converge, and 
+    will make it difficult to reach a global or even a local maximum.
+
+    To do this I start by using an auxiliary function \textit{readFile()}, which returns a list of dictionaries, 
+    where each dictionary has as key the events and as value a list of the times in which the event has happened.
+    \begin{figure}[H]
+        \begin{tikzpicture}[node distance=1cm]
+            % Definir la forma específica del diagrama de flujo
+            \node[startstop](start){Start};
+            \node[process, below of = start, yshift = -0.5cm](pro0){For dictionary in list of dictionaries};
+            \node[io, below of = pro0, yshift = -0.5cm](in1){Initialize last epoch, count, diff letters and iterations};
+
+            \node[process, below of = in1, yshift = -0.5cm](pro1){For element in solution};
+
+            \node[decision, below of = pro1, yshift = -1cm](dec0){if type(element) == list};
+            \node[process, right of = dec0, xshift = 2cm, yshift = -2cm](pro2){dictionary.get(element[0]) and dictionary.get(element[1])};
+            \node[process, left of = dec0, xshift = -3cm, yshift = -2cm](pro3){dictionary.get(element)};
+        
+            \node[decision, below of = pro2, yshift = -1cm](dec1){epoch1 == epoch2};
+            \node[process, right of = dec1, xshift = 2cm, yshift = -3.5cm](pro4){Penaliza};
+        
+            \node[decision, left of = dec1, xshift = -2cm, yshift = -2cm](dec2){epoch $\geq$ last epoch};
+            \node[process, left of = dec2, xshift = -2cm, yshift = -1.5cm](pro5){Puntua};
+            \coordinate (converge) at (0cm, -16cm);
+            \node[io, below of = converge, yshift = -0.5cm](out){return total/length, frequency, diff letters};
+        
+            \coordinate (left) at (-6cm, -16cm);
+            \coordinate (elementloop) at (0cm, -5.2cm);
+            \coordinate (left2) at (-8.2, -16cm);
+            \coordinate (dicionaryloop) at (0cm, -2.2cm);
+
+            % Conectar forma específica
+            \draw [arrow] (start) -- (pro0);
+            \draw [arrow] (pro0) -- (in1);
+            \draw [arrow] (in1) -- (pro1);
+            \draw [arrow] (pro1) -- (dec0);
+            \draw (dec0) -| node [left] {N} (pro3);  
+            \draw (dec0) -| node [right] {Y} (pro2);  
+            \draw [arrow] (pro2) -- (dec1);   
+            \draw (dec1) -| node [left] {Y} (dec2);  
+            \draw (dec1) -| node [right] {N} (pro4);
+            \draw [arrow] (dec2) -| node [left] {Y} (pro5);
+            \draw [arrow] (dec2) -| node [right] {N} (pro4);
+            \draw [arrow] (pro3) -- (dec2);
+
+            \draw [arrow] (pro5) -- (converge);
+            \draw [arrow] (pro4) -- (converge);
+            \draw [arrow] (converge) -- (out);
+        
+            \draw [arrow] (converge) -- (left);
+            \draw [arrow] (left) |- (elementloop);
+
+            \draw [arrow] (converge) -- (left2);
+            \draw [arrow] (left2) |- (dicionaryloop);
+        
+        \end{tikzpicture}
+
+        \caption{Class Diagram of Evaluation Function}
+        \label{Class Diagram of Evaluation Function}
+    \end{figure}
+
+    \section{Implementation}
+
+    I started by doing a basic genetic algorithm, but as I said before 
+    I wanted to do something different from the implementation done in assignment 2.
+
+    One of the biggest problems of this algorithm is the computational time needed by the evaluation function,
+    so reducing the number of calls it recieves is very worth it. I tried to parallelise the evaluation of the solutions, 
+    but the result I got was a longer evaluation time. 
+
+    Also to have more intensification I thought on applying Simulated Annealing to change the degree to which worse solutions are accepted
+    or, what finally I applyed, Hill Climbing to search the best neighbour of good enough solutions.
+
+    \subsection{Parallelism}
+
+    This was my first time working with python threads, and I think this was one of the reasons why the result is so bad.
+
+    I had thought about testing this implementation but the time it takes makes it prohibitive, we would be talking about hours.
+
+    \begin{lstlisting}
+    def geneticAlgorithmMultiprocessing(nSolutions,
+        maxGenerations,mProb,cProb,k,elitism, 
+                min_length, max_length):
+
+        ...
+        while it < maxGenerations:
+
+            nSolutions = applyGeneticOperator(population,k,
+                                                    cProb,mProb,
+                                                        events)
+
+            #Generational model
+            population = []
+
+            process = []
+            for solution in nSolutions:
+            
+                # initialize total and frequency
+                total = multiprocessing.Value('d',0.0)
+                frequency = multiprocessing.Value('d',0.0)
+                diff_letters = multiprocessing.Value('d',0.0)
+                # creating a lock object
+                #lock = multiprocessing.Lock()
+
+                # creating new processes
+                p = multiprocessing.Process(
+                    target=evaluateSolution_thread,
+                        args=(solution[0],events,
+                            list_of_dictionaries,len(solution[0]),
+                            total, frequency, diff_letters))
+
+                process.append(p)
+
+                # starting processes
+                p.start()
+
+                # wait until processes are finished
+                for p in process:
+                    p.join()
+
+                population.append([solution[0], (total.value, 
+                    frequency.value, diff_letters.value)])
+
+            it+=1
+        ...
+        
+    \end{lstlisting}
+
+    \subsection{Applying Caching}
+
+        By applying caching we can see how the time and computational cost is practically halved.
+        
+        \begin{lstlisting}
+        def geneticAlgorithmMultiprocessing(nSolutions,
+            maxGenerations,mProb,cProb,k,elitism, min_length, 
+                max_length):
+    
+            ...
+            while it < maxGenerations:
+    
+                nSolutions = applyGeneticOperator(population,k,
+                    cProb,mProb,events)
+    
+                #Generational model
+                population = []
+    
+                process = []
+                for solution in nSolutions:
+                
+                    if solution in evaluated_solutions:
+                        index = 
+                            evaluated_solutions.index(solution)
+                        population.append(
+                            evaluated_solutions[int(index)])
+                    
+                    else:
+                        population.append(
+                            [solution[0],evaluateSolution(
+                                solution[0],events,
+                                    list_of_dictionaries,
+                                        len(solution[0]) )])
+    
+            it+=1
+            ...
+            
+        \end{lstlisting}
+
+    \subsection{Applying Hill Climbing}
+
+    Implementing hill climbing has pros and cons.
+    On one hand, the population converges much earlier, resulting in better results in fewer generations.
+    On the other hand, the number of evaluations the algorithm performs while searching for the best neighbour makes it slower.
+
+    \begin{lstlisting}
+        def getBestNeighbor(solution, data, events, 
+            list_of_dictionaries):
+            
+            ##Get the neighbors
+            neighbors = []
+            l=len(solution[0])
+
+            for i in range(l):
+                for j in range(i+1, l):
+                    n = solution[0].copy()
+                    n[i] = solution[0][j]
+                    n[j] = solution[0][i]
+                    neighbors.append(n)
+            
+            ##Get the best neighbor
+            bestNeighbor = neighbors[0]
+            ##evaluateSolution(solutions,events,
+                list_of_dictionaries,
+                    len(solutions) )
+            
+            bestTotal,bestFrequency,bestNEvents = 
+                evaluateSolution(bestNeighbor, events,
+                 list_of_dictionaries, len(bestNeighbor))
+    
+            for neighbor in neighbors:
+        
+                Total,Frequency,NEvents = 
+                    evaluateSolution(neighbor, events, 
+                        list_of_dictionaries, len(bestNeighbor))
+        
+                if Total > bestTotal:
+                    bestTotal = Total
+                    bestFrequency = Frequency
+                    bestNEvents = NEvents
+
+                    bestNeighbor = neighbor
+
+            return bestNeighbor, 
+                (bestTotal, bestFrequency, bestNEvents)
+
+        def hillClimbing(data, events, list_of_dictionaries):
+    
+            solution = []
+    
+            solution.append(data[0][0])
+
+            total = data[0][1][0]
+    
+            neighbour = getBestNeighbor(solution, data, 
+                events, list_of_dictionaries)
+
+            while neighbour[1][0] > total:
+                solution = neighbour
+                total = neighbour[1][0]
+                neighbour = getBestNeighbor(solution, data, 
+                    events, list_of_dictionaries)
+
+            return solution[0]
+        
+        def geneticAlgorithmMultiprocessing(nSolutions,
+            maxGenerations,mProb,cProb,k,elitism, 
+                min_length, max_length):
+    
+                ...
+                while it < maxGenerations:
+    
+                    ...
+
+                    population.sort(reverse=True,key=lambda 
+                        population: (population[1][0], 
+                            population[1][2]) )
+
+                    if population[0][1][0] > 60:
+                        bestNeighbour = list(hillClimbing(
+                            population, events, 
+                                list_of_dictionaries))
+            
+                        population.pop()
+                
+                        population.append(
+                            [bestNeighbour,evaluateSolution(
+                                bestNeighbour,events,
+                                    list_of_dictionaries,
+                                        len(bestNeighbour) )])
+            
+            it+=1
+            ...
+    \end{lstlisting}
+
+\end{document}
