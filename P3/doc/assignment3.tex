@@ -161,10 +161,10 @@
             \node[process, left of = dec0, xshift = -3cm, yshift = -2cm](pro3){dictionary.get(element)};
         
             \node[decision, below of = pro2, yshift = -1cm](dec1){epoch1 == epoch2};
-            \node[process, right of = dec1, xshift = 2cm, yshift = -3.5cm](pro4){Penaliza};
+            \node[process, right of = dec1, xshift = 2cm, yshift = -3.5cm](pro4){Penalize};
         
             \node[decision, left of = dec1, xshift = -2cm, yshift = -2cm](dec2){epoch $\geq$ last epoch};
-            \node[process, left of = dec2, xshift = -2cm, yshift = -1.5cm](pro5){Puntua};
+            \node[process, left of = dec2, xshift = -2cm, yshift = -1.5cm](pro5){Increases fitness};
             \coordinate (converge) at (0cm, -16cm);
             \node[io, below of = converge, yshift = -0.5cm](out){return total/length, frequency, diff letters};
         
@@ -404,5 +404,75 @@
             it+=1
             ...
     \end{lstlisting}
+
+    \newpage
+
+    \section{Evaluation}
+
+    To compare the algorithms I used the google colab environment and the 
+    following hyperparameters: 
+
+    \begin{itemize}
+        \item Size of the population = 50
+        \item Maximum generations = 150\footnote{Except for the implementation using parallelism that I used 100 because of the time complexity.} for [7$-$9], 200 for [10$-$14], 400 for [15$-$30]
+        \item Mutation probability = 0.4
+        \item Crossover probability = 0.8
+        \item Tournament size = 3
+        \item Elitism = True
+    \end{itemize}
+
+    \begin{figure}[H]
+
+        \centering
+        \includegraphics[width=0.75\textwidth]{../media/descarga.png}
+        \caption{Comparison of different implementations}
+        \label{Comparison of different implementations}
+
+    \end{figure}
+
+    \subsection{Execution time}
+
+    I must have made some mistake that I can't find in the measurement of the data and its presentation 
+    in the graph because in other tests that I have carried out you can see how the one using hill climbing 
+    is much slower, during the execution this can be seen thanks to Google Colab in its lower part shows which 
+    function is running and the results are that it takes an hour running the repetitions of the algorithm, 
+    while the other two only take twenty minutes.
+
+    Another thing that does not make sense is that the GA with caching is slower than GA with elitism, 
+    I don't know if this is because the randomly generated solutions at the beginning are worse in the 
+    case of implementation using cache or that caching has no effect because solutions are not repeated, 
+    in which case the execution time should be the same and not vary so much.
+
+    \subsection{Number of Events}
+
+    In the case of the number of events nothing remarkable happens, only that the greater the length of the 
+    solution there is a greater probability of obtaining results with a greater number of events.
+
+    \subsection{Frequency}
+
+    It makes sense that the worst one is the basic genetic algorithm. The implementation using Hill Climbing 
+    is better because when the solution already has a moderately good fitness we look for its best neighbor 
+    and add it to the population, which generates a population with very good solutions.
+    What has surprised me is that using caching improves the frequency so much, because the only thing I am 
+    doing is to avoid re-evaluating previously evaluated solutions, which has an improvement in time, but I 
+    do not quite understand why in the quality of the solutions as well.
+
+    \section{Conclusions}
+
+    In my opinion and from the tests I have carried out I think that for this problem it is very 
+    beneficial to use an average mutation probability, because the space to explore is very large, 
+    we would be talking about $N^{20}$ where N is the length of the solution, and the probability of 
+    being trapped in a local maximum is very high.
+
+    For the evaluation section I would have liked to carry out a more exhaustive analysis with a 
+    larger number of repetitions, not only twenty, and a larger number of generations for the 
+    intervals [10$-$14] and [15$-$30], but the time needed to carry out this task is prohibitive, 
+    just as it has been impossible to carry out the measurements for the implementation that uses 
+    parallelism, doing some calculations to carry out the analysis I would like, would entail a 
+    time cost of 155 hours.
+
+    Increasing the number of generations for the above-mentioned intervals would significantly 
+    increase the quality of the population and therefore the frequency.
+
 
 \end{document}
